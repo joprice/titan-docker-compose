@@ -1,0 +1,36 @@
+
+# Run with docker-compose -f titan.yml up
+
+# https://hub.docker.com/r/elubow/titan-gremlin
+# https://github.com/docker-library/docs/tree/master/cassandra
+# https://hub.docker.com/_/elasticsearch/
+
+# TODO: scaling configuration for cassandara and elasticsearch
+# TODO: configure volumes for persistence between runs
+
+cassandra:
+  image: cassandra 
+  ports:
+    - "7199:7199"
+    - "9160:9160" 
+    - "7000:7000"
+    - "9042:9042" 
+    - "61621:61621" 
+  entrypoint: "/docker-entrypoint.sh cassandra -f -Dcassandra.start_rpc=true"
+
+elasticsearch:
+  image: elasticsearch
+  ports:
+    - "9200:9200"
+    - "9300:9300"
+  entrypoint: "bash -c '/docker-entrypoint.sh elasticsearch -Des.network.host=`hostname --ip-address`'"
+
+titan:
+  image: elubow/titan-gremlin
+  ports:
+    - "8182:8182" 
+    - "8184:8184" 
+  links:
+    - elasticsearch 
+    - cassandra 
+
